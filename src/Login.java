@@ -5,9 +5,10 @@ public class Login {
     private String password;
     private boolean acesso = false;
     private String acaoSelecionada;
+    private static final Scanner scanner = new Scanner(System.in); // Scanner global
+
     // Construtor Padrão
-    public Login() {
-    }
+    public Login() {}
 
     // Construtor com Parâmetros
     public Login(String username, String password) {
@@ -15,20 +16,16 @@ public class Login {
         this.password = password;
     }
 
-    //Metodo sem retorno
+    // Método sem retorno
     public void doLogin() {
-        Scanner scanner = new Scanner(System.in);
-
-
-        if (this.username == null || this.password == null) { //inicia solicitação de usuário e senha
+        if (this.username == null) {
             System.out.println("Seja bem-vindo à HASF!");
             System.out.println("------".repeat(10));
-            System.out.print("Digite seu nome de usuario: ");
+            System.out.print("Digite seu nome de usuário: ");
             this.username = scanner.nextLine();
         }
 
         int tentativas = 0;
-
 
         while (tentativas < 3) {
             if (this.password == null) {
@@ -36,73 +33,70 @@ public class Login {
                 this.password = scanner.nextLine();
             }
 
-            // Verifica as credenciais usando a classe `Usuarios`
+            // Verifica as credenciais usando a classe `DadosUsuarios`
             if (DadosUsuarios.cruzamentoDados(this.username, this.password)) {
                 System.out.println("Acesso efetuado com sucesso para o usuário " + this.username);
                 this.acesso = true;
-                break;
+                return;
             } else {
-                System.out.println("Seu nome de usuario ou senha estão incorretos!");
+                System.out.println("Seu nome de usuário ou senha estão incorretos!");
                 tentativas++;
 
                 if (tentativas < 3) {
-                    String resposta;
-                    do {
-                        System.out.print("Esqueceu sua senha? (s/n): ");
-                        resposta = scanner.nextLine().trim().toLowerCase();
+                    System.out.print("Esqueceu sua senha? (s/n): ");
+                    String resposta = scanner.nextLine().trim().toLowerCase();
 
-                        if (resposta.equals("s")) {
-                            recuperarSenha(username);
-                            return;
-                        } else if (!resposta.equals("n")) {
-                            System.out.println("Opção inválida! Responda apenas com 's' ou 'n'.");
-                        }
-                    } while (!resposta.equals("s") && !resposta.equals("n"));
-
-                    // Resetando a senha para nova tentativa
-                    this.password = null;
+                    if (resposta.equals("s")) {
+                        recuperarSenha(username);
+                        tentativas = 0;  // Reseta tentativas após redefinição de senha
+                        return;
+                    }
                 }
+                this.password = null; // Resetando senha para nova tentativa
             }
         }
 
-        if (!this.acesso) {
-            System.out.println("Seu cadastro foi bloqueado. Entre em contato com o suporte!");
-        }
-
-        scanner.close();
+        System.out.println("Seu cadastro foi bloqueado. Entre em contato com o suporte!");
     }
-    public boolean temAcesso(){
+
+    public boolean temAcesso() {
         return this.acesso;
     }
 
-    public void selecionaAcao(){
-        if (this.temAcesso()){
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("O que você gostaria de fazer?");
-            System.out.print("Selecione uma opção: ");
-            System.out.print("0 -> Ver saldo: ");
-            System.out.print("1 -> Realizar transação: ");
-            System.out.print("2 -> Sair: ");
-            String opcao = scanner.nextLine().trim().toLowerCase();
-
-            switch (opcao) {
-                case "0":
-                    this.acaoSelecionada = "SALDO";
-                    break;
-                case "1":
-                    this.acaoSelecionada = "TRANSACAO";
-                    break;
-                case "2":
-                    this.acaoSelecionada = "SAIR";
-                    break;
-                default:
-                    this.acaoSelecionada = "DEFAULT";
-            }
+    public void selecionaAcao() {
+        if (!this.temAcesso()) {
+            System.out.println("Sem permissão para executar essa função.");
+            return;
         }
-        System.out.println("Sem permissão para executar essa função.");
+
+        System.out.println("O que você gostaria de fazer?");
+        System.out.println("0 -> Ver saldo");
+        System.out.println("1 -> Realizar transação");
+        System.out.println("2 -> Sair");
+        System.out.print("Selecione uma opção: ");
+        String opcao = scanner.nextLine().trim().toLowerCase();
+
+        switch (opcao) {
+            case "0":
+                this.acaoSelecionada = "SALDO";
+                break;
+            case "1":
+                this.acaoSelecionada = "TRANSACAO";
+                break;
+            case "2":
+                this.acaoSelecionada = "SAIR";
+                break;
+            default:
+                this.acaoSelecionada = "DEFAULT";
+        }
     }
+
     private void recuperarSenha(String username) {
         System.out.println("Recuperação de senha iniciada para o usuário: " + username);
         System.out.println("Verifique seu e-mail para instruções sobre como redefinir sua senha.");
+    }
+
+    public String retornaAcaoSelecionada() {
+        return this.acaoSelecionada;
     }
 }
