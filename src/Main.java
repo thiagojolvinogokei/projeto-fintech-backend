@@ -36,6 +36,7 @@ public class Main {
                         DadosUsuarios.STATUS3);
             }
 
+            // Controle de fluxos depois de logar
             login.selecionaAcao();
             usuario.executaAcao(login.retornaAcaoSelecionada());
 
